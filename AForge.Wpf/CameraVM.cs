@@ -16,7 +16,7 @@ namespace CameraUIControl
         BAAdsPlcClient _plcClient;
         private bool _bstartcamera; // Local varible to hold PLC var toggles value
         private List<IBAAdsNotification> _notifications;
-
+        
         /// <summary>
         /// Constructor; class is used as ViewModel for Control
         /// </summary>
@@ -38,6 +38,8 @@ namespace CameraUIControl
             // So these should in form load and a a remove on a form unload or visability change
             _plcClient.AddPlcDeviceNotification(notifyStartCamera);
         }
+
+        
 
         // Call handler if change in state event is notification happens for toggle PLC variable
         private void StartCameraVarHandler(object sender, BAAdsNotificationItem notification)

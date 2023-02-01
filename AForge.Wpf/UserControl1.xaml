@@ -8,30 +8,29 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Image x:Name="videoPlayer" Margin="30,21,38,36" />
+        <Image x:Name="videoPlayer" Margin="30,21,38,81" />
         <ComboBox x:Name="comboBox"
-            Width="167"
-            Height="21"
+            Width="197"
+            Height="45"
             Margin="30,0,0,10"
             HorizontalAlignment="Left"
             VerticalAlignment="Bottom"
             DisplayMemberPath="Name"
-            ItemsSource="{Binding VideoDevices}"
-            SelectedItem="{Binding CurrentDevice}" />
+            FontSize="16" />
         <Button x:Name="btnStartCamera" Width="67"
-            Height="21"
+            Height="45"
             Margin="343,0,0,10"
             HorizontalAlignment="Left"
             VerticalAlignment="Bottom"
             Content="Start" Click="btnStartCamera_Click" />
         <Button x:Name="btnStopCamera" Width="67"
-            Height="21"
+            Height="45"
             Margin="435,0,0,10"
             HorizontalAlignment="Left"
             VerticalAlignment="Bottom"
             Content="Stop" Click="btnStopCamera_Click" />
         <Button x:Name="btnGetDevices" 
-            Height="21"    
+            Height="45"    
             Content="Get Devices" 
             HorizontalAlignment="Left" 
             Margin="251,0,0,10" 

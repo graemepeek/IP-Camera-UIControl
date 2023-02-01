@@ -33,11 +33,14 @@ namespace CameraUIControl
         BAAdsPlcClient _plcClient;
         private bool _bstartcamera;
         private bool _startcamera;
+
         public bool StartCameraCommand
         {
             get { return _startcamera; }
             set { _startcamera = _plcClient.ReadSymbol<bool>("Global_HMI.bStartCamera"); }
         }
+
+       
 
         public event PropertyChangedEventHandler PropertyChanged;
         public ObservableCollection<FilterInfo> VideoDevices { get; set; }
@@ -47,7 +50,9 @@ namespace CameraUIControl
              get { return _currentDevice; }
              set { _currentDevice = value; this.OnPropertyChanged("CurrentDevice"); }
           }
-        
+
+        public string sCounter { get; 
+                                 set; }
         private IVideoSource _videoSource;
 
         public UserControl1()
@@ -67,13 +72,14 @@ namespace CameraUIControl
         protected void OnPropertyChanged([CallerMemberName] string CurrentDevice = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(CurrentDevice));
+            comboBox.Items.Add("_currentDevice.Name");
         }
 
         private void btnStartCamera_Click(object sender, RoutedEventArgs e)
         {
             StartCamera();
         }
-        
+                
         private void GetVideoDevices()
         {
             
