@@ -1,0 +1,31 @@
+﻿<?xml version="1.0"?>
+<!--
+Config file is located in "System\IoCConfig". It is automatically loaded from Unity.
+Example: Name of Control: UIControl1
+-->
+
+
+<configuration>
+  <configSections>
+    <section name="unity" type="Microsoft.Practices.Unity.Configuration.UnityConfigurationSection, Microsoft.Practices.Unity.Configuration" />
+  </configSections>
+  <unity>
+    <alias alias="Object" type="System.Object, mscorlib" />
+    <alias alias="singleton" type="Microsoft.Practices.Unity.ContainerControlledLifetimeManager, Microsoft.Practices.Unity" />
+    <container>
+
+      <!-- UI Control Demo-->
+      <register type="Object" mapTo="CameraUIControl.UserControl1, CameraUIControl" name="UICameraControl">
+        <property name="DataContext" >
+          <dependency type="Object" name="CameraVM" />
+        </property>
+      </register>
+      <register type="Object" mapTo="CameraUIControl.CameraVM, CameraUIControl" name="CameraVM">
+        <constructor>
+          <param name="iocContainer" />
+        </constructor>
+      </register>
+
+    </container>
+  </unity>
+</configuration>
