@@ -15,12 +15,12 @@ Example: Name of Control: UIControl1
     <container>
 
       <!-- UI Control Demo-->
-      <register type="Object" mapTo="CameraUIControl.UserControl1, CameraUIControl" name="UICameraControl">
+      <register type="Object" mapTo="IPCameraUIControl.UserControl1, IPCameraUIControl" name="UIIPCameraControl">
         <property name="DataContext" >
           <dependency type="Object" name="CameraVM" />
         </property>
       </register>
-      <register type="Object" mapTo="CameraUIControl.CameraVM, CameraUIControl" name="CameraVM">
+      <register type="Object" mapTo="IPCameraUIControl.CameraVM, IPCameraUIControl" name="CameraVM">
         <constructor>
           <param name="iocContainer" />
         </constructor>

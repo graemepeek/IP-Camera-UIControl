@@ -4,18 +4,11 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using AForge.Video;
 using AForge.Video.DirectShow;
 using Beckhoff.App.Ads.Core;
@@ -23,26 +16,53 @@ using Beckhoff.App.Ads.Core.Plc;
 using Beckhoff.App.Core.Interfaces;
 using System.Runtime.CompilerServices;
 
-namespace CameraUIControl
+
+namespace IPCameraUIControl
 {
     /// <summary>
     /// Interaction logic for UserControl1.xaml
     /// </summary>
     public partial class UserControl1 : UserControl, INotifyPropertyChanged
     {
-        BAAdsPlcClient _plcClient;
-        private bool _bstartcamera;
-        private bool _startcamera;
+        BAAdsPlcClient _plcClient; // not used in this example but here for reference
 
+        #region Public properties
+
+        public string ConnectionString
+        {
+            get { return _connectionString; }
+            set { _connectionString = value; this.OnPropertyChanged("ConnectionString"); }
+        }
+        public bool UseMjpegStream
+        {
+            get { return _useMJPEGStream; }
+            set { _useMJPEGStream = value; this.OnPropertyChanged("UseMjpegStream"); }
+        }
+        public bool UseJpegStream
+        {
+            get { return _useJPEGStream; }
+            set { _useJPEGStream = value; this.OnPropertyChanged("UseJpegStream"); }
+        }
+
+        #endregion
+        #region Private fields
+
+        private string _connectionString;
+        private bool _useMJPEGStream;
+        private bool _useJPEGStream;
+        private IVideoSource _videoSource;
+        private bool _startcamera;
+        #endregion
+
+        // not used in this example but here for reference
         public bool StartCameraCommand
         {
             get { return _startcamera; }
             set { _startcamera = _plcClient.ReadSymbol<bool>("Global_HMI.bStartCamera"); }
         }
-
+        
+        //public event PropertyChangedEventHandler PropertyChanged;
        
-
-        public event PropertyChangedEventHandler PropertyChanged;
         public ObservableCollection<FilterInfo> VideoDevices { get; set; }
         private FilterInfo _currentDevice;
         public FilterInfo CurrentDevice
@@ -50,10 +70,6 @@ namespace CameraUIControl
              get { return _currentDevice; }
              set { _currentDevice = value; this.OnPropertyChanged("CurrentDevice"); }
           }
-
-        public string sCounter { get; 
-                                 set; }
-        private IVideoSource _videoSource;
 
         public UserControl1()
         {
@@ -63,44 +79,35 @@ namespace CameraUIControl
         {
             InitializeComponent();
             this.DataContext = this;
-            
             var adsServer = iocContainer.Resolve<IBAAdsServer>();// get ADSServer
             _plcClient = adsServer.GetAdsClient<IBAAdsPlcClient>("PLC") as BAAdsPlcClient;   // get PLC Client from ADS Server
-
+            ConnectionString = "http://<axis_camera_ip>/axis-cgi/jpg/image.cgi";
+            // Test address
+            ConnectionString = "http://88.53.197.250/axis-cgi/mjpg/video.cgi?resolution=320x240";
+            UseMjpegStream = true;
+            tbConnectionString.Text = ConnectionString;
+            rbMPeg.IsChecked = true;
         }
-
-        protected void OnPropertyChanged([CallerMemberName] string CurrentDevice = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(CurrentDevice));
-            comboBox.Items.Add("_currentDevice.Name");
-        }
-
         private void btnStartCamera_Click(object sender, RoutedEventArgs e)
         {
-            StartCamera();
+           UseJpegStream = ((bool)rbJpeg.IsChecked); // force read of radio button state as binding not working at this point TODO:
+           ConnectionString = tbConnectionString.Text;
+            // create JPEG video source
+            if (UseJpegStream)
+            {
+                _videoSource = new JPEGStream(ConnectionString);
+            }
+            else // UseMJpegStream
+            {
+                _videoSource = new MJPEGStream(ConnectionString);
+            }
+            _videoSource.NewFrame += new NewFrameEventHandler(video_NewFrame);
+            _videoSource.Start();
         }
-                
-        private void GetVideoDevices()
-        {
-            
-            VideoDevices = new ObservableCollection<FilterInfo>();
-            foreach (FilterInfo filterInfo in new FilterInfoCollection(FilterCategory.VideoInputDevice))
-            {
-                VideoDevices.Add(filterInfo);
-            }
-            if (VideoDevices.Any())
-            {
-                CurrentDevice = VideoDevices[0];
-            }
-            else
-            {
-                MessageBox.Show("No video sources found", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-
         
-        private void video_NewFrame(object sender, AForge.Video.NewFrameEventArgs eventArgs)
+
+         
+        private void video_NewFrame(object sender, NewFrameEventArgs eventArgs)
         {
             try
             {
@@ -143,9 +150,21 @@ namespace CameraUIControl
             StopCamera();
         }
 
-        private void btnGetDevices_Click(object sender, RoutedEventArgs e)
+
+
+        #region INotifyPropertyChanged members
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName)
         {
-            GetVideoDevices(); // Get video devices connected to this PC
+            PropertyChangedEventHandler handler = this.PropertyChanged;
+            if (handler != null)
+            {
+                var e = new PropertyChangedEventArgs(propertyName);
+                handler(this, e);
+            }
         }
+
+        #endregion
     }
 }

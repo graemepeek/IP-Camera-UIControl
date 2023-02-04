@@ -9,7 +9,7 @@ using Beckhoff.App.Core.Interfaces;
 using GalaSoft.MvvmLight;
 
 
-namespace CameraUIControl
+namespace IPCameraUIControl
 {
     public class CameraVM : ViewModelBase
     {
@@ -51,7 +51,8 @@ namespace CameraUIControl
                     _bstartcamera = (bool)(notification.PlcObject);
                     if (_bstartcamera)
                     {
-                       // CameraUIControl.UserControl1;
+                       //CameraUIControl.UserControl1.
+                       
                     }
                 }
             }
